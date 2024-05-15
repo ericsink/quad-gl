@@ -1,14 +1,45 @@
 [package]
 authors = ["not-fl3 <not.fl3@gmail.com>"]
-description = "Statefull immediate mode rendering libarary on top of miniquad.\nInspired by opengl1, rlgl and sokol-gl.\n"
+description = "Statefull immediate mode rendering libarary on top of miniquad."
 edition = "2018"
 homepage = "https://github.com/not-fl3/quad-gl"
 license = "MIT/Apache-2.0"
 name = "quad-gl"
 repository = "https://github.com/not-fl3/quad-gl"
-version = "0.2.4"
+version = "0.4.0"
+
+[package.metadata.android]
+assets = "examples/"
+
+[profile.dev.package."*"]
+opt-level = 3
+
+[package.metadata.docs.rs]
+all-features = true
 
 [dependencies]
-miniquad = { version = "0.3.0-alpha" }
-glam = {version = "0.8", features = ["scalar-math"] }
-image = { version = "0.22", default-features = false, features = ["png_codec"] }
+miniquad = { version = "=0.4.0", features = ["log-impl"] }
+quad-rand = "0.2.1"
+glam = {version = "0.24", features = ["scalar-math","mint"] }
+fontdue = { git = "https://github.com/not-fl3/fontdue.git", default-features = false, features = ["std"] }
+backtrace = { version = "0.3.60", optional = true, default-features = false, features = [ "std", "libbacktrace" ] }
+log = { version = "0.4", optional = true }
+quad-snd = { version = "0.2", optional = true }
+slotmap = "1.0"
+nanogltf = { path = "../nanogltf" }
+shadermagic = { path = "../shadermagic" }
+zune-jpeg = "*"
+zune-png = "*"
+zune-core = "*"
+
+[dev-dependencies]
+dolly = "*"
+
+[patch.crates-io]
+#quad-snd = {path = '../quad-snd'}
+#miniquad = { path = '../miniquad' }
+#fontdue = { git = '../fontdue' }
+#quad-gl = {path = './quad-gl'}
+#zune-jpeg = { path = "../zune-image/zune-jpeg" }
+#zune-png = { path = "../zune-image/zune-png" }
+#zune-core = { path = "../zune-image/zune-core" }
