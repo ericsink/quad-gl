@@ -90,15 +90,13 @@ async fn load_file(path: &str) -> Result<Vec<u8>, Error> {
 }
 
 impl crate::Context3 {
-    pub async fn load_gltf(&self, path: &str) -> Result<Model, Error> {
+    pub fn load_gltf(&self, gltf: &str) -> Result<Model, Error> {
         use nanogltf::{utils, Gltf};
         use std::borrow::Cow;
 
         let mut ctx = self.quad_ctx.lock().unwrap();
 
-        let bytes = load_string(path).await?;
-
-        let gltf = Gltf::from_json(&bytes).unwrap();
+        let gltf = Gltf::from_json(&gltf).unwrap();
         //println!("{:#?}", &gltf);
         let mut buffers = vec![];
         for buffer in &gltf.buffers {
@@ -106,10 +104,11 @@ impl crate::Context3 {
                 utils::UriData::Bytes(bytes) => bytes,
                 utils::UriData::RelativePath(uri) => {
                     // examples/assets/a.gltf -> examples/assets
-                    use std::path::Path;
-                    let path = Path::new(&path);
-                    let parent = path.parent().map_or("", |parent| parent.to_str().unwrap());
-                    load_file(&format!("{}/{}", parent, uri)).await?
+                    // use std::path::Path;
+                    // let path = Path::new(&path);
+                    // let parent = path.parent().map_or("", |parent| parent.to_str().unwrap());
+                    // load_file(&format!("{}/{}", parent, uri)).await?
+                    unimplemented!()
                 }
             };
             buffers.push(bytes);
@@ -124,9 +123,10 @@ impl crate::Context3 {
                 utils::ImageSource::Bytes(ref bytes) => Cow::from(bytes),
                 utils::ImageSource::RelativePath(ref uri) => {
                     use std::path::Path;
-                    let path = Path::new(&path);
-                    let parent = path.parent().map_or("", |parent| parent.to_str().unwrap());
-                    Cow::from(load_file(&format!("{}/{}", parent, uri)).await?)
+                    // let path = Path::new(&path);
+                    // let parent = path.parent().map_or("", |parent| parent.to_str().unwrap());
+                    // Cow::from(load_file(&format!("{}/{}", parent, uri)).await?)
+                    unimplemented!()
                 }
                 utils::ImageSource::Slice {
                     buffer,
@@ -319,22 +319,22 @@ impl crate::Context3 {
         Ok(Model { nodes, aabb })
     }
 
-    pub async fn load_cubemap(
+    pub fn load_cubemap(
         &self,
-        texture_px: &str,
-        texture_nx: &str,
-        texture_py: &str,
-        texture_ny: &str,
-        texture_pz: &str,
-        texture_nz: &str,
+        texture_px: &[u8],
+        texture_nx: &[u8],
+        texture_py: &[u8],
+        texture_ny: &[u8],
+        texture_pz: &[u8],
+        texture_nz: &[u8],
     ) -> Result<crate::cubemap::Cubemap, crate::Error> {
         let cubemap = [
-            &load_file(texture_px).await?[..],
-            &load_file(texture_nx).await?[..],
-            &load_file(texture_py).await?[..],
-            &load_file(texture_ny).await?[..],
-            &load_file(texture_pz).await?[..],
-            &load_file(texture_nz).await?[..],
+            &texture_px[..],
+            &texture_nx[..],
+            &texture_py[..],
+            &texture_ny[..],
+            &texture_pz[..],
+            &texture_nz[..],
         ];
         let mut quad_ctx = self.quad_ctx.lock().unwrap();
         let cubemap = crate::cubemap::Cubemap::new(quad_ctx.as_mut(), &cubemap[..]);
@@ -657,7 +657,7 @@ impl Scene {
             if let crate::camera::Environment::Solid(color) = camera.environment {
                 clear_action = PassAction::clear_color(color.r, color.g, color.b, color.a);
             }
-
+            
             unsafe {
                 miniquad::gl::glFlush();
                 miniquad::gl::glFinish();

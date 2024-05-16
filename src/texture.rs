@@ -90,30 +90,6 @@ impl Image {
         }
     }
 
-    /// Creates an Image from a slice of bytes that contains an encoded image.
-    ///
-    /// If `format` is None, it will make an educated guess on the
-    /// [ImageFormat][image::ImageFormat].
-    ///
-    /// # Example
-    ///
-    /// ```
-    /// # use macroquad::prelude::*;
-    /// let icon = Image::from_file_with_format(
-    ///     include_bytes!("../examples/rust.png"),
-    ///     Some(ImageFormat::Png),
-    ///     );
-    /// ```
-    pub fn from_file_with_format(bytes: &[u8]) -> Result<Image, Error> {
-        let img = crate::image::decode(bytes).unwrap();
-
-        Ok(Image {
-            width: img.width as u16,
-            height: img.height as u16,
-            bytes: img.data,
-        })
-    }
-
     /// Creates an Image filled with the provided [Color].
     pub fn gen_image_color(width: u16, height: u16, color: Color) -> Image {
         let mut bytes = vec![0; width as usize * height as usize * 4];
